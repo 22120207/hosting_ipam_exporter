@@ -18,9 +18,24 @@ func main() {
 
 	filteredIpList := []string{}
 	for _, ip := range ipList {
+		fields := strings.Split(ip, "/")
+
+		if len(fields) > 0 {
+			ip = fields[0]
+		} else {
+			continue
+		}
+
+		ip = strings.TrimSpace(ip)
+
+		if ip == "" {
+			continue
+		}
+
 		if isPublicIP, err := helper.IsPublicIPv4(ip); isPublicIP && err == nil {
 			filteredIpList = append(filteredIpList, ip)
 		} else if err != nil {
+			log.Printf("[%s]", ip)
 			log.Printf("Error in check IPv4: %v", err)
 		}
 	}

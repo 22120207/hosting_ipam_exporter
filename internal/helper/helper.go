@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	"os/exec"
+	"strings"
 	"time"
 )
 
@@ -53,10 +54,10 @@ func SendToWebhook(ipList []string) {
 	jsonStr := string(jsonData)
 
 	cmd := `curl \
-	-H "Authorization: " \
+  	-H "Authorization: Bearer Ts3GkAzpAx1xG7Q" \
 	-X POST \
 	-d '` + jsonStr + `' \
-	"http://14.225.204.41:5555/v1//hosting/ipam"`
+	"http://14.225.204.41:5555/v1/hosting/ipam"`
 
 	log.Printf("Curl command: %s", cmd)
 
@@ -80,14 +81,14 @@ func RunCommand(cmd string) (string, error) {
 }
 
 func getHostname() string {
-	cmd := `cat /etc/hostname'`
+	cmd := `cat /etc/hostname`
 
 	output, err := RunCommand(cmd)
 	if err != nil {
 		log.Println(err)
 	}
 
-	return string(output)
+	return strings.ReplaceAll(string(output), " ", "")
 }
 
 func IsPublicIPv4(ipStr string) (bool, error) {
