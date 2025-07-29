@@ -18,19 +18,21 @@ var (
 	outgoingIP ipType = "Outgoing IP"
 )
 
+type IPv4 struct {
+	Value string `json:"value"`
+	Type  ipType `json:"type"`
+}
+
+type Request struct {
+	Hostname  string `json:"hostname"`
+	HostIP    []IPv4 `json:"ipv4"`
+	AuthenKey string `json:"auth"`
+}
+
 func SendToWebhook(ipList []string) {
-	type IPv4 struct {
-		Value string `json:"value"`
-		Type  ipType `json:"type"`
-	}
-
-	type Request struct {
-		Hostname string `json:"hostname"`
-		HostIP   []IPv4 `json:"ipv4"`
-	}
-
 	var req Request
 	req.Hostname = getHostname()
+	req.AuthenKey = "Ts3GkAzpAx1xG7Q"
 
 	for index, ip := range ipList {
 		ipv4 := IPv4{
@@ -88,7 +90,7 @@ func getHostname() string {
 		log.Println(err)
 	}
 
-	return strings.ReplaceAll(string(output), " ", "")
+	return strings.TrimSpace(string(output))
 }
 
 func IsPublicIPv4(ipStr string) (bool, error) {
