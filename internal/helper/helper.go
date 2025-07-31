@@ -29,9 +29,9 @@ type Request struct {
 	AuthenKey string `json:"auth"`
 }
 
-func SendToWebhook(ipList []string) {
+func SendToWebhook(ipList []string) error {
 	var req Request
-	req.Hostname = getHostname()
+	req.Hostname = GetHostname()
 	req.AuthenKey = "Ts3GkAzpAx1xG7Q"
 
 	for index, ip := range ipList {
@@ -49,14 +49,12 @@ func SendToWebhook(ipList []string) {
 
 	jsonData, err := json.Marshal(req)
 	if err != nil {
-		fmt.Println("Error marshaling JSON:", err)
-		return
+		return fmt.Errorf("error marshaling JSON: %v", err)
 	}
 
 	jsonStr := string(jsonData)
 
 	cmd := `curl \
-  	-H "Authorization: Bearer Ts3GkAzpAx1xG7Q" \
 	-X POST \
 	-d '` + jsonStr + `' \
 	"http://14.225.204.41:5555/v1/hosting/ipam"`
@@ -65,9 +63,12 @@ func SendToWebhook(ipList []string) {
 
 	output, err := RunCommand(cmd)
 	if err != nil {
-		fmt.Println(output)
-		return
+		return fmt.Errorf("error %s in send to webhook with output %s", err, output)
+	} else {
+		log.Printf("Webhook Output: %s", output)
 	}
+
+	return nil
 }
 
 func RunCommand(cmd string) (string, error) {
@@ -82,7 +83,7 @@ func RunCommand(cmd string) (string, error) {
 	return string(output), nil
 }
 
-func getHostname() string {
+func GetHostname() string {
 	cmd := `cat /etc/hostname`
 
 	output, err := RunCommand(cmd)
